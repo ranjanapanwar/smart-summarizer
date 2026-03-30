@@ -44,6 +44,31 @@ def summarize(request: SummarizeRequest):
     except Exception as e:
         return "Error: " + str(e)
     
+@app.post("/summarize-sync")
+def summarize_sync(request: SummarizeRequest):
+    if not request.text.strip():
+        return {"error": "Please enter text to summarize"}
+    
+    try:
+        messages = [
+            {"role": "system", "content": "You need to summarize the input, make sure the length is not greater than 150 and you need to give bullet points"},
+            {"role": "user", "content": request.text}
+        ]
+        response = client.chat.completions.create(
+            model = "llama-3.1-8b-instant",
+            messages = messages,
+            stream= False
+        )
+
+        return {"summary": response.choices[0].message.content}
+    
+    except groq.AuthenticationError:
+        return  "Invalid API Key"
+    except groq.RateLimitError:
+        return "Too many requests, try again"
+    except Exception as e:
+        return "Error: " + str(e)
+
 
 def generator(stream):
     for chunk in stream:
