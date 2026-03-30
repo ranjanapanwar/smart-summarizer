@@ -7,12 +7,14 @@ def summarize(text):
         return "Please enter text to summarize"
     
     try:
-       
-        response = requests.post(URL, json={"text": text})
-        return response.json()["summary"]
-
+        full_text: str = ""
+        stream = requests.post(URL, json={"text": text}, stream=True)
+        for chunk in stream.iter_lines():
+            full_text += chunk.decode().removeprefix("data: ")
+            yield full_text
+        
     except Exception as e:
-        return "Error: " + str(e)
+        yield "Error: " + str(e)
         
 
 iface = gr.Interface(
@@ -23,4 +25,4 @@ iface = gr.Interface(
     description = "Powered by Groq/LLaMA"
 )
 
-if __name__ == "__main__": iface.launch()
+if __name__ == "__main__": iface.launch(server_name="0.0.0.0")

@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from groq import Groq
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.responses import StreamingResponse
 
 load_dotenv()
 key = os.environ.get("GROQ_API_KEY")
@@ -25,12 +26,16 @@ def summarize(request: SummarizeRequest):
             {"role": "user", "content": request.text}
         ]
 
-        response = client.chat.completions.create(
+        stream = client.chat.completions.create(
             model = "llama-3.1-8b-instant",
-            messages = messages
+            messages = messages,
+            stream=True
         )
 
-        return {"summary": response.choices[0].message.content}
+
+        return StreamingResponse(generator(stream), media_type="text/event-stream")
+
+
     
     except groq.AuthenticationError:
         return  "Invalid API Key"
@@ -40,7 +45,15 @@ def summarize(request: SummarizeRequest):
         return "Error: " + str(e)
     
 
+def generator(stream):
+    for chunk in stream:
+        content = chunk.choices[0].delta.content
+        if content is not None:
+            yield f"data: {content}\n\n"
+    return    
 
+
+        
 
     
 
