@@ -1,6 +1,6 @@
 import gradio as gr, requests
 
-URL = "http://localhost:8000/summarize"
+URL = "http://localhost:7860/summarize"
 
 def summarize(text):
     if not text.strip():
