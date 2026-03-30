@@ -4,6 +4,8 @@ from groq import Groq
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
+import gradio as gr
+from app import iface
 
 load_dotenv()
 key = os.environ.get("GROQ_API_KEY")
@@ -14,6 +16,7 @@ class SummarizeRequest(BaseModel):
     text: str
 
 app = FastAPI()
+app = gr.mount_gradio_app(app, iface, path="/")
 
 @app.post("/summarize")
 def summarize(request: SummarizeRequest):

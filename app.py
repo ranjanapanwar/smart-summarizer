@@ -25,4 +25,4 @@ iface = gr.Interface(
     description = "Powered by Groq/LLaMA"
 )
 
-if __name__ == "__main__": iface.launch(server_name="0.0.0.0")
+#if __name__ == "__main__": iface.launch(server_name="0.0.0.0")
