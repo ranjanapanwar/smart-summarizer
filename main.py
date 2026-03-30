@@ -16,7 +16,6 @@ class SummarizeRequest(BaseModel):
     text: str
 
 app = FastAPI()
-app = gr.mount_gradio_app(app, iface, path="/")
 
 @app.post("/summarize")
 def summarize(request: SummarizeRequest):
@@ -72,6 +71,8 @@ def summarize_sync(request: SummarizeRequest):
     except Exception as e:
         return "Error: " + str(e)
 
+
+app = gr.mount_gradio_app(app, iface, path="/")
 
 def generator(stream):
     for chunk in stream:
